@@ -10,12 +10,8 @@ const InvalidConfigPath  ="./.git/invalid_config"
 const SshUrl  ="git@github.com:mo7amed-3bdalla7/grurl.git"
 const HttpUrl  ="https://github.com/mo7amed-3bdalla7/grurl.git"
 
-func NewConfig() *RemoteConfig {
-	return &RemoteConfig{data: map[string]string{}}
-}
-
 func TestRemoteConfig_ParseFile_validConfigPath(t *testing.T) {
-	config := NewConfig()
+	config := NewRemoteConfig()
 
 	config.ParseFile(ConfigPath)
 
@@ -25,7 +21,7 @@ func TestRemoteConfig_ParseFile_validConfigPath(t *testing.T) {
 }
 
 func TestRemoteConfig_ParseFile_invalidConfigPath(t *testing.T) {
-	config := NewConfig()
+	config := NewRemoteConfig()
 
 	err := config.ParseFile(InvalidConfigPath)
 
@@ -44,7 +40,7 @@ func TestRemoteConfig_Parse(t *testing.T) {
 
 	defer file.Close()
 
-	config := NewConfig()
+	config := NewRemoteConfig()
 
 	config.configPath = ConfigPath
 

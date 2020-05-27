@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,11 +10,42 @@ import (
 )
 
 func main() {
-	config := RemoteConfig{data: map[string]string{}}
+	listOption := flag.Bool("list", false, "list all remote names with URLs and exit")
+	remoteOption := flag.String("remote", "origin", "to set the remote name you for required url")
+	pathOption := flag.String("path", ".", "to set the git repository path")
 
-	config.ParseFile("./.git/config")
+	flag.Parse()
 
-	fmt.Print(config.data)
+	path := *pathOption + "/.git/config"
+	config := NewRemoteConfig()
+	err := config.ParseFile(path)
+
+	if err != nil {
+		fmt.Println("Check path value.")
+		os.Exit(1)
+	}
+
+	if *remoteOption == "" {
+		fmt.Println("Remote value is required.")
+		os.Exit(1)
+	}
+
+	if *listOption {
+		for key, value := range config.data {
+			fmt.Printf("%s \t %s\n", key, value)
+		}
+		return
+	}
+
+	if *remoteOption != "" {
+		if url, err := config.data[*remoteOption]; err {
+			fmt.Println(url)
+			return
+		}
+		fmt.Println("This remote isn't exist.")
+		os.Exit(1)
+	}
+
 }
 
 type RemoteConfig struct {
@@ -88,4 +120,8 @@ func SshUrlToHttpUrl(url string) string {
 	}
 
 	return url
+}
+
+func NewRemoteConfig() *RemoteConfig {
+	return &RemoteConfig{data: map[string]string{}}
 }
